@@ -1,7 +1,7 @@
 package dasniko.aws.secretsmanager;
 
+import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
-import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
 
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
@@ -9,9 +9,12 @@ import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRespon
 public class AwsSecretsReader {
 
     public static void main(String[] args) {
-        SecretsManagerClient secretsManager = SecretsManagerClient.create();
-        GetSecretValueResponse response = secretsManager.getSecretValue(builder -> builder.secretId(args[0]).build());
-        String secretString = response.secretString();
+        SecretsManagerClient secretsManager = SecretsManagerClient.builder()
+            .httpClientBuilder(UrlConnectionHttpClient.builder())
+            .build();
+        String secretString = secretsManager
+            .getSecretValue(builder -> builder.secretId(args[0]).build())
+            .secretString();
         System.out.println(secretString);
     }
 
